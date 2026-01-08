@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RPG Mobile</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #222;
+    color: white;
+    text-align: center;
+    margin: 0;
+    padding: 10px;
+}
+
+#game {
+    max-width: 400px;
+    margin: auto;
+    background: #333;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+button {
+    padding: 10px;
+    margin: 5px;
+    width: 90%;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+}
+
+.attack { background: crimson; color: white; }
+.heal { background: green; color: white; }
+.next { background: dodgerblue; color: white; }
+
+.stats {
+    background: #444;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="game">
+    <h2>⚔️ RPG Mobile</h2>
+
+    <div class="stats" id="playerStats"></div>
+    <div class="stats" id="monsterStats"></div>
+
+    <p id="log">Un monstre apparaît !</p>
+
+    <button class="attack" onclick="attack()">Attaquer</button>
+    <button class="heal" onclick="heal()">Se soigner</button>
+    <button class="next" onclick="nextMonster()">Nouveau combat</button>
+</div>
+
+<script>
+let player = {
+    hp: 100,
+    maxHp: 100,
+    attack: 10,
+    level: 1,
+    xp: 0,
+    gold: 0
+};
+
+let monster = {};
+
+function createMonster() {
+    monster = {
+        hp: 50 + player.level * 10,
+        attack: 5 + player.level * 2
+    };
+}
+
+function updateUI() {
+    document.getElementById("playerStats").innerHTML =
+        `🧙 Niveau: ${player.level}<br>
+         ❤️ Vie: ${player.hp}/${player.maxHp}<br>
+         ⭐ XP: ${player.xp}<br>
+         💰 Or: ${player.gold}`;
+
+    document.getElementById("monsterStats").innerHTML =
+        `👾 Monstre<br>
+         ❤️ Vie: ${monster.hp}`;
+}
+
+function attack() {
+    if (monster.hp <= 0) return;
+
+    monster.hp -= player.attack;
+    document.getElementById("log").innerText = "Tu attaques le monstre !";
+
+    if (monster.hp <= 0) {
+        win();
+        return;
+    }
+
+    player.hp -= monster.attack;
+    if (player.hp <= 0) {
+        player.hp = 0;
+        document.getElementById("log").innerText = "💀 Tu es mort... Soigne-toi !";
+    }
+
+    updateUI();
+}
+
+function heal() {
+    if (player.gold >= 5) {
+        player.hp = player.maxHp;
+        player.gold -= 5;
+        document.getElementById("log").innerText = "✨ Tu es soigné !";
+    } else {
+        document.getElementById("log").innerText = "❌ Pas assez d'or !";
+    }
+    updateUI();
+}
+
+function win() {
+    player.xp += 10;
+    player.gold += 10;
+    document.getElementById("log").innerText = "🎉 Monstre vaincu !";
+
+    if (player.xp >= 50) {
+        player.level++;
+        player.xp = 0;
+        player.maxHp += 20;
+        player.attack += 5;
+        player.hp = player.maxHp;
+        document.getElementById("log").innerText += " ⬆️ Niveau supérieur !";
+    }
+
+    updateUI();
+}
+
+function nextMonster() {
+    createMonster();
+    updateUI();
+    document.getElementById("log").innerText = "👾 Un nouveau monstre apparaît !";
+}
+
+createMonster();
+updateUI();
+</script>
+
+</body>
+</html>
